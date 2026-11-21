@@ -159,6 +159,18 @@
             "session.closed": "#/components/schemas/session.closed"
           }
         }
+      },
+      "BoundaryCreateRequest": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "default_decision_ttl_seconds": {
+            "type": "integer",
+            "default": 300
+          }
+        }
       }
     },
     "securitySchemes": {
@@ -6195,7 +6207,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Record"
+                "$ref": "#/components/schemas/BoundaryCreateRequest"
               }
             }
           }
