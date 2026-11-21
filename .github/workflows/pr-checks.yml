@@ -1,0 +1,16 @@
+name: Validate documentation
+on: workflow_call
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: |
+          python3 -m json.tool docs.json > /dev/null
+          for dir in api-reference/endpoint api-reference/webhook snippets scripts images fonts logo videos test; do test -d "$dir"; done
+          python3 scripts/generate_cheat_sheet.py
+          git diff --exit-code -- api-reference/cheat-sheet.mdx

@@ -1,0 +1,35 @@
+name: Synchronize documentation
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: docs-sync
+jobs:
+  synchronize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: middleware
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: boundarykit/docs-kestrel
+          ref: main
+          path: docs
+          token: ${{ secrets.DOCS_SYNC_TOKEN }}
+      - working-directory: docs
+        run: |
+          cp ../middleware/openapi.json openapi.json
+          python3 scripts/generate_api_pages.py ../middleware/openapi.json
+          python3 scripts/generate_cheat_sheet.py
+          git add --all
+          if ! git diff --cached --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m 'docs: refresh API reference'
+            git push origin HEAD:main
+          fi
